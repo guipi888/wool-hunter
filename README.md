@@ -78,8 +78,3 @@ scripts/search.py
 ## License
 
 MIT License — 详见 [LICENSE](./LICENSE)
-
-## 引流信息
-
-> 💡 更多实用 AI 效率工具和技能，领取自媒体 IP&超级个体&一人公司资料，关注公众号「桂皮AI实战」
-> 📱 加入自媒体&AI 副业变现交流群：https://e418e2e692454bfaa8b6206e3f0ba789.app.codebuddy.work
