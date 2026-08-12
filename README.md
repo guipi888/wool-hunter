@@ -69,11 +69,10 @@ scripts/search.py
 |------|------|
 | 📱 小红书 | [桂皮AI实战](https://www.xiaohongshu.com/user/profile/5a409dda44363b313b9d7e15) |
 | 🎬 抖音 | [桂皮AI实战](https://v.douyin.com/QJRjHGAtrvA/) |
-| 📺 视频号 | 微信内搜「桂皮AI实战」 |
-| 💬 公众号 | 微信搜「桂皮AI实战」 |
-| 🌟 知识星球 | [AI超级个体](https://t.zsxq.com/guSUk) — AI工具 · 创作 · 产品 · 流量 · 变现 |
+| 📺 视频号 | 微信内搜「桂皮AI实战」|
+| 💬 公众号 | 微信搜「桂皮AI实战」|
 | 🐙 GitHub | [guipi888](https://github.com/guipi888) |
-| 💬 微信 | guipi996（注明来意） |
+| 💬 微信 | guipi996（注明来意）|
 
 ## License
 
