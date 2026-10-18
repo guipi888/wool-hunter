@@ -82,7 +82,6 @@ scripts/
 ├── s12_affiliate.py        # S12 副业变现（本地备用）
 ├── taobao_affiliate.py     # 淘宝联盟选品/转链（🟡 待上线）
 ├── call_bot.py             # Coze 兜底（需自配 token）
-└── search.py               # 旧版比价（🟡 待修复：缺 aiohttp）
 ```
 
 ## 输出

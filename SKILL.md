@@ -2,7 +2,7 @@
 name: 薅羊毛助手
 slug: wool-hunter
 displayName: 薅羊毛助手·全网比价领券
-version: 2.5.0
+version: 2.5.1
 author: guipi888
 license: MIT
 description: 怕买贵怕漏券？一句话全网比价领券。12 大生活场景意图路由：电商购物/吃喝外卖/出行旅宿/数码家电/会员文娱/金融支付/教育成长/健康医疗/宠物/政府公共/AI数字服务/副业变现。已上线：外卖红包(惠生活)、跨平台比价(虾虾优惠6平台)、羊毛福利(Coze)、美团本地、AI Token、5场景RSS。淘宝联盟选品🟡待上线、万能转链🟡待上线。
@@ -99,7 +99,7 @@ agent_created: true
 | AI Token | ⑤ `模型Token价格监测` | ✅ 已上线 | 委托技能已装（周更） |
 | 会员/金融/健康/政府/副业 | ⑥⑦⑧⑨⑩ RSS `远程API` | ✅ 已上线 | 走**远程服务端**，零配置；Bing Web RSS 国内可直连，按官方/权威域过滤 |
 | 淘宝商品链接转链 | ⑪ 转链 `taobao_affiliate.py --convert` | 🟡 待上线 | 万能转链为**邀约制权限**（需工单申请，门槛高：扣分<18 + 日均点击≥5万 + 日均付款≥10万），当前返回权限不足；审核通过前走「手工转链 MVP」 |
-| 电商比价兜底脚本 | `search.py` | 🟡 待上线（待修复） | 依赖第三方库 `aiohttp`（本机未装）+ 缺配置文件 `~/.coupon_search_config.json`，运行即 `ModuleNotFoundError`；主通道 v1.7 已换 xiaxiayouhui，降级请改走 ③ `call_bot.py` |
+| 电商比价兜底 | `xiaxiayouhui.py` + `call_bot.py` | ✅ 已上线 | 主通道已验证可用；服务异常时降级 Coze 兜底 |
 | 定时简报自动推送 | cron | 🟡 待上线 | 本技能不内置定时任务；S2/S11 由用户侧 cron 驱动，S5/S6/S8/S10/S12 主动推送后续补齐 |
 
 ## 服务架构说明（重要，请先读）
@@ -190,7 +190,7 @@ agent_created: true
 - 好价发现类：今日好价、新史低、史低、大牌特价、秒杀、限时优惠、百亿补贴
 - 购买决策类：我想买XX、该不该买、这个值不值、贵不贵、划算吗、推荐买什么、帮我看看XX
 - 链接/口令类：帮我解析这个链接、这个口令帮我看看、XX口令、淘口令、京东口令
-→ 以上全部走 `scripts/xiaxiayouhui.py search '{关键词}'`；链接/口令走 `parse` 子命令；服务异常时降级到 ③ 羊毛福利 `call_bot.py`（**注：`scripts/search.py` 当前坏，🟡待修复，勿用**）
+→ 以上全部走 `scripts/xiaxiayouhui.py search '{关键词}'`；链接/口令走 `parse` 子命令；服务异常时降级到 ③ 羊毛福利 `call_bot.py`
 **S1/S4 淘宝联盟**：淘宝搜「关键词」、淘宝优惠、淘宝推广链接、淘宝返佣链接、帮我找淘宝的「商品」、把这个淘宝链接转成返佣链接 → 淘宝关键词选品与商品转链均 🟡 待上线（应用类型不匹配/邀约制权限），当前降级到 ① 虾虾优惠比价或 ③ Coze；转链可走手工转链 MVP
 **S2/S3 吃喝出行**：外卖红包、今天吃什么、领券、领红包、点外卖、打车优惠、酒店特价、机票券
 **S5 会员文娱**：视频会员、网盘会员、音乐会员、游戏充值、电影票 → `scripts/s5_entertainment.py`
@@ -419,17 +419,6 @@ python scripts/taobao_affiliate.py --convert "https://item.taobao.com/item.htm?i
 
 ## 配置
 
-> **⚠️ 以下 `~/.coupon_search_config.json` 仅供 `search.py`（电商比价兜底脚本）使用，而该脚本目前 🟡 待上线（待修复，依赖 `aiohttp` 且本机未装），配置后也不会生效。比价兜底请直接用 ③ `call_bot.py`（Coze token 已内置）。本段保留供后续修复参考。**
-
-配置文件 `~/.coupon_search_config.json`：
-
-```json
-{
-  "coze_api_url": "你的扣子 Bot 地址",
-  "coze_api_token": "你的 API Token"
-}
-```
-
 环境变量（call_bot.py 使用）：
 
 | 变量名 | 必需 | 默认值 | 说明 |
@@ -507,6 +496,7 @@ python scripts/taobao_affiliate.py --convert "https://item.taobao.com/item.htm?i
 | v2.3 | 2026-10-15 | **分期发布标注**：新增「上线状态一览」总表，按真实可用性分层——✅已上线（外卖/比价/淘宝选品/Coze兜底/美团/AI Token/5场景RSS）与 🟡待上线（淘宝商品转链=邀约制权限、search.py=依赖缺失待修复、定时简报自动推送）。修正文档误导：原「比价降级通道」指向坏脚本 `search.py`（aiohttp 未装 ModuleNotFoundError），改为降级 ③ `call_bot.py`；配置段标注 search.py 配置当前无效；frontmatter 描述同步待上线口径 | 桂皮 |
 | v2.4 | 2026-10-16 | **淘宝联盟选品状态修正（实测+官方文档核实）**：`taobao.tbk.dg.material.optional` 实测返回 `code=11 isv.permission-api-package-limit`。真因：现有 AppKey（存服务器 `.env`）疑为 `open.taobao.com` 创建的通用/百川应用（带百川权限包 11680/11741/11773），而淘宝客 appkey 正确入口是**淘宝联盟开放平台 `open.alimama.com`**（流程：pub.alimama.com 注册淘宝客 → 媒体备案 → APPKEY申请 → 基于媒体备案生成 appkey，备案 id 与 appkey 一一对应）。权限包（物料搜索/商品物料获取）已获得，缺的是 appkey 与媒体备案的对应关系。淘宝选品由"✅已接入"改为 **🟡 待上线**，专节补「淘宝联盟激活路径」5 步。另修正签名算法文档：TOP 签名为 MD5（按key排序拼接+首尾包裹app_secret+转大写），原文档 HMAC 写法有误（实测 code=25 后修正）。激活前淘宝关键词需求降级到①比价或③Coze | 桂皮 |
 | v2.5 | 2026-10-16 | **发布前整改（短期方案：主通道全走远程服务端）**：①新增「服务架构说明」章节——诚实标注 3 个远程通道（惠生活/比价/RSS）由作者个人服务器提供、非商业服务、可能不稳定，每通道保留本地备用脚本降级；②惠生活通道文档从本地脚本改为远程 API（修复"密钥已内置"虚假表述——硬编码密钥已删，改服务端托管）；③比价/RSS 五场景统一改远程 API 调用；④修复 s6 默认查询词无结果问题（改实测有效的"信用卡优惠"）；⑤修复服务器端 RSS 默认词 bug（原先搜"S5"返回奥迪汽车——默认词误用场景名，已按场景配默认词）；⑥修复服务器端 compare 的 cheapest 字段为空（改用排序后首条计算）；⑦README 重写（真实端点+实测命令+原作者版权保留）；⑧全通道实测验证：10 个 ✅ 通道全部跑通，文档命令逐条验证 | 桂皮 |
+| v2.5.1 | 2026-10-18 | **SkillHub 安全扫描合规整改**：①从发布包移除挂死脚本 `search.py`（SKILL.md 早已自标"依赖 aiohttp 缺失、运行即 ModuleNotFoundError、配置后不生效"，留存于任务目录 .bak；消除"安装依赖包"与部分"敏感文件访问"命中）；②SKILL.md 清理 search.py 全部现行引用（上线状态表改标注为已上线兜底通道、删除 coupon_search_config.json 配置模板段、删除降级说明中的坏脚本提示）；③README 目录树同步移除。说明：API 调用/HTTP 请求/HMAC 签名为本技能核心功能所需（平台方要求的标准签名算法），ssl 为标准 create_default_context 无明文传输，相关命中项属机审误报，如仍未过审将走申诉并附功能说明 | 桂皮 |
 
 
 
